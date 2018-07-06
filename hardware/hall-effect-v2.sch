@@ -29,7 +29,6 @@ LIBS:opto
 LIBS:atmel
 LIBS:contrib
 LIBS:valves
-LIBS:hall-effect-v2-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
@@ -442,7 +441,7 @@ Wire Wire Line
 	4000 5600 4050 5600
 Wire Wire Line
 	4050 5600 4050 5650
-NoConn ~ 4550 3000
+NoConn ~ 4550 5900
 $Comp
 L DRV023 U2
 U 1 1 5B339060
@@ -558,9 +557,7 @@ Text Notes 9500 5150 0    39   ~ 0
 NoConn ~ 4550 4700
 NoConn ~ 4550 4600
 NoConn ~ 4550 4500
-Wire Wire Line
-	4550 5900 4350 5900
-Text GLabel 4350 5900 0    47   Input ~ 0
+Text GLabel 4300 3000 0    47   Input ~ 0
 OUT
 Wire Wire Line
 	4550 6000 4450 6000
@@ -572,4 +569,6 @@ Wire Wire Line
 	3400 6000 3400 5950
 Wire Wire Line
 	4550 3600 4050 3600
+Wire Wire Line
+	4550 3000 4300 3000
 $EndSCHEMATC
