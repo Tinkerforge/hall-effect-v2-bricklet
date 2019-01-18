@@ -1,4 +1,4 @@
-update=Mi 09 Jan 2019 17:11:36 CET
+update=Fr 18 Jan 2019 13:03:50 CET
 version=1
 last_client=kicad
 [cvpcb]
@@ -50,3 +50,13 @@ LibName13=Logo
 [eeschema]
 version=1
 LibDir=
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceAjustPassiveValues=0
+LabSize=50
+ERC_TestSimilarLabels=1
