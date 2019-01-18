@@ -464,8 +464,6 @@ Connection ~ 9000 4700
 Wire Wire Line
 	9000 3750 9000 4700
 NoConn ~ 4550 4700
-NoConn ~ 4550 4600
-NoConn ~ 4550 4500
 Wire Wire Line
 	4550 6000 4450 6000
 Wire Wire Line
