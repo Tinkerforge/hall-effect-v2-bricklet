@@ -70,12 +70,11 @@
     (pad_size 0.8 1.2)
     (pad_drill 0)
     (pad_to_mask_clearance 0)
-    (solder_mask_min_width 0.25)
     (aux_axis_origin 176.9 165.9)
     (grid_origin 176.9 165.9)
     (visible_elements FFFD7FBF)
     (pcbplotparams
-      (layerselection 0x00030_80000001)
+      (layerselection 0x0103c_ffffffff)
       (usegerberextensions false)
       (usegerberattributes false)
       (usegerberadvancedattributes false)
@@ -100,7 +99,7 @@
       (mirror false)
       (drillshape 0)
       (scaleselection 1)
-      (outputdirectory "best/"))
+      (outputdirectory "pcb/"))
   )
 
   (net 0 "")
@@ -6919,7 +6918,7 @@
   (segment (start 45.689 43.811) (end 45.689 43.316) (width 0.3) (layer Vorderseite) (net 20) (tstamp 5C41BB4B) (status 800000))
   (segment (start 45.25 44.25) (end 45.689 43.811) (width 0.3) (layer Vorderseite) (net 20) (tstamp 5C41BB4A) (status 400000))
 
-  (zone (net 1) (net_name GND) (layer Rückseite) (tstamp 5C41E516) (hatch edge 0.508)
+  (zone (net 1) (net_name GND) (layer Rückseite) (tstamp 5C46D48E) (hatch edge 0.508)
     (connect_pads (clearance 0.24892))
     (min_thickness 0.24892)
     (fill yes (arc_segments 16) (thermal_gap 0.29972) (thermal_bridge_width 0.29972))
