@@ -20,7 +20,7 @@
   )
 
   (layers
-    (0 Vorderseite signal hide)
+    (0 Vorderseite signal)
     (31 Rückseite signal hide)
     (32 B.Adhes user)
     (33 F.Adhes user)
@@ -72,10 +72,10 @@
     (pad_to_mask_clearance 0)
     (aux_axis_origin 176.9 165.9)
     (grid_origin 176.9 165.9)
-    (visible_elements FFFD7FBF)
+    (visible_elements FFFDFFBF)
     (pcbplotparams
-      (layerselection 0x0103c_ffffffff)
-      (usegerberextensions false)
+      (layerselection 0x010fc_ffffffff)
+      (usegerberextensions true)
       (usegerberattributes false)
       (usegerberadvancedattributes false)
       (creategerberjobfile false)
@@ -94,7 +94,7 @@
       (plotvalue false)
       (plotinvisibletext false)
       (padsonsilk false)
-      (subtractmaskfromsilk false)
+      (subtractmaskfromsilk true)
       (outputformat 1)
       (mirror false)
       (drillshape 0)
@@ -6918,7 +6918,7 @@
   (segment (start 45.689 43.811) (end 45.689 43.316) (width 0.3) (layer Vorderseite) (net 20) (tstamp 5C41BB4B) (status 800000))
   (segment (start 45.25 44.25) (end 45.689 43.811) (width 0.3) (layer Vorderseite) (net 20) (tstamp 5C41BB4A) (status 400000))
 
-  (zone (net 1) (net_name GND) (layer Rückseite) (tstamp 5C46D48E) (hatch edge 0.508)
+  (zone (net 1) (net_name GND) (layer Rückseite) (tstamp 5C6C0A57) (hatch edge 0.508)
     (connect_pads (clearance 0.24892))
     (min_thickness 0.24892)
     (fill yes (arc_segments 16) (thermal_gap 0.29972) (thermal_bridge_width 0.29972))
