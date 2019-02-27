@@ -31,50 +31,34 @@
 #include "xmc_eru.h"
 #include "xmc_ccu4.h"
 
-#define DRV5053_ZERO_OFFSET (1020*1000/90)
+#define DRV5053_ZERO_OFFSET_MV  (1020)
+#define DRV5053_ZERO_OFFSET_ADC (DRV5053_ZERO_OFFSET_MV*1000/90)
 
 DRV5053 drv5053;
 
-#define drv5053_irq_cmp0 IRQ_Hdlr_3
-static uint32_t drv5053_count0 = 0;
-void __attribute__((optimize("-O3"))) __attribute__ ((section (".ram_code"))) drv5053_irq_cmp0(void) {
-    XMC_CCU4_SLICE_StartTimer(DRV5053_TMR0_CCU4_CC);
-	NVIC_DisableIRQ(DRV5053_CMP0_IRQ);
-	NVIC_ClearPendingIRQ(DRV5053_CMP0_IRQ);
+#define drv5053_irq_cmp IRQ_Hdlr_3
+static volatile uint32_t drv5053_count = 0;
+void __attribute__((optimize("-O3"))) __attribute__ ((section (".ram_code"))) drv5053_irq_cmp(void) {
+    XMC_CCU4_SLICE_StartTimer(DRV5053_TMR_CCU4_CC);
+	NVIC_DisableIRQ(DRV5053_CMP_IRQ);
+	NVIC_ClearPendingIRQ(DRV5053_CMP_IRQ);
 
-	drv5053_count0++;
-}
-
-#define drv5053_irq_cmp1 IRQ_Hdlr_4
-static uint32_t drv5053_count1 = 0;
-void __attribute__((optimize("-O3"))) __attribute__ ((section (".ram_code"))) drv5053_irq_cmp1(void) {
-    XMC_CCU4_SLICE_StartTimer(DRV5053_TMR1_CCU4_CC);
-	NVIC_DisableIRQ(DRV5053_CMP1_IRQ);
-	NVIC_ClearPendingIRQ(DRV5053_CMP1_IRQ);
-
-
-	drv5053_count1++;
+	drv5053_count++;
 }
 
 #define drv5053_irq_adc IRQ_Hdlr_16
-static uint32_t drv5053_adc_count = 0;
-static uint32_t drv5053_adc_value = 0;
+static volatile uint32_t drv5053_adc_count = 0;
+static volatile uint32_t drv5053_adc_value = 0;
 void __attribute__((optimize("-O3"))) __attribute__ ((section (".ram_code"))) drv5053_irq_adc(void) {
 	const uint32_t result =  XMC_VADC_GROUP_GetDetailedResult(VADC_G0, 10);
 	drv5053_adc_value += (result & 0xFFFF);
 	drv5053_adc_count++;
 }
 
-#define drv5053_irq_tmr0 IRQ_Hdlr_21
-void __attribute__((optimize("-O3"))) __attribute__ ((section (".ram_code"))) drv5053_irq_tmr0(void) {
-	NVIC_ClearPendingIRQ(DRV5053_CMP0_IRQ);
-	NVIC_EnableIRQ(DRV5053_CMP0_IRQ);
-}
-
-#define drv5053_irq_tmr1 IRQ_Hdlr_22
-void __attribute__((optimize("-O3"))) __attribute__ ((section (".ram_code"))) drv5053_irq_tmr1(void) {
-	NVIC_ClearPendingIRQ(DRV5053_CMP1_IRQ);
-	NVIC_EnableIRQ(DRV5053_CMP1_IRQ);
+#define drv5053_irq_tmr IRQ_Hdlr_21
+void __attribute__((optimize("-O3"))) __attribute__ ((section (".ram_code"))) drv5053_irq_tmr(void) {
+	NVIC_ClearPendingIRQ(DRV5053_CMP_IRQ);
+	NVIC_EnableIRQ(DRV5053_CMP_IRQ);
 }
 
 void drv5053_init_adc(void) {
@@ -244,7 +228,7 @@ void drv5053_init_comperator(void) {
 		.input_b                    = XMC_ERU_ETL_INPUT_B0, // Event input selection for B(0-3)
 		.enable_output_trigger      = 1,
 		.status_flag_mode           = XMC_ERU_ETL_STATUS_FLAG_MODE_HWCTRL, // enable the status flag auto clear for opposite edge
-		.edge_detection             = XMC_ERU_ETL_EDGE_DETECTION_FALLING,   // Select the edge/s to convert as event
+		.edge_detection             = XMC_ERU_ETL_EDGE_DETECTION_FALLING,  // Select the edge/s to convert as event
 		.output_trigger_channel     = XMC_ERU_ETL_OUTPUT_TRIGGER_CHANNEL0, // Select the source for event
 		.source                     = XMC_ERU_ETL_SOURCE_A
 	};
@@ -257,16 +241,13 @@ void drv5053_init_comperator(void) {
 	XMC_ERU_OGU_SetServiceRequestMode(XMC_ERU0, DRV5053_CMP1_OGU_CHANNEL, XMC_ERU_OGU_SERVICE_REQUEST_ON_TRIGGER);
 
 	// Configure NVIC node and priority
-	NVIC_SetPriority(DRV5053_CMP0_IRQ, DRV5053_CMP0_IRQ_PRIORITY);
-	NVIC_SetPriority(DRV5053_CMP1_IRQ, DRV5053_CMP1_IRQ_PRIORITY);
+	NVIC_SetPriority(DRV5053_CMP_IRQ, DRV5053_CMP_IRQ_PRIORITY);
 
 	// Clear pending interrupt before enabling it
-	NVIC_ClearPendingIRQ(DRV5053_CMP0_IRQ);
-	NVIC_ClearPendingIRQ(DRV5053_CMP1_IRQ);
+	NVIC_ClearPendingIRQ(DRV5053_CMP_IRQ);
 
 	// Enable NVIC node
-	NVIC_EnableIRQ(DRV5053_CMP0_IRQ);
-	NVIC_EnableIRQ(DRV5053_CMP1_IRQ);
+	NVIC_EnableIRQ(DRV5053_CMP_IRQ);
 
 	// Initialize reference voltage (through CCU4 with external filter)
 	const XMC_GPIO_CONFIG_t ref_source_output_pin_config = {
@@ -295,10 +276,10 @@ void drv5053_init_comperator(void) {
 	XMC_CCU4_StartPrescaler(CCU40);
 	XMC_CCU4_SLICE_CompareInit(DRV5053_REF0_CCU4_CC, &compare_config);
 	XMC_CCU4_SLICE_CompareInit(DRV5053_REF1_CCU4_CC, &compare_config);
-	XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_REF0_CCU4_CC, DRV5053_ZERO_OFFSET*2/10-1);
-	XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_REF1_CCU4_CC, DRV5053_ZERO_OFFSET*2/10-1);
+	XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_REF0_CCU4_CC, 3300-1);
+	XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_REF1_CCU4_CC, 3300-1);
 	XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_REF0_CCU4_CC, 0);
-	XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_REF1_CCU4_CC, DRV5053_ZERO_OFFSET*2/10);
+	XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_REF1_CCU4_CC, 3300);
 	XMC_CCU4_EnableShadowTransfer(CCU40, DRV5053_REF0_CCU4_SLICE);
 	XMC_CCU4_EnableShadowTransfer(CCU40, DRV5053_REF1_CCU4_SLICE);
 	XMC_CCU4_EnableClock(CCU40, DRV5053_REF0_CCU4_SLICE_NUM);
@@ -323,25 +304,16 @@ void drv5053_init_timer(void) {
 		.timer_concatenation = false
 	};
 
-    XMC_CCU4_EnableClock(DRV5053_TMR_CCU4, DRV5053_TMR0_CCU4_SLICE_NUM);
-    XMC_CCU4_EnableClock(DRV5053_TMR_CCU4, DRV5053_TMR1_CCU4_SLICE_NUM);
-    XMC_CCU4_SLICE_CompareInit(DRV5053_TMR0_CCU4_CC, &timer_config);
-    XMC_CCU4_SLICE_CompareInit(DRV5053_TMR1_CCU4_CC, &timer_config);
-    XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_TMR0_CCU4_CC, UINT16_MAX);
-    XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_TMR1_CCU4_CC, UINT16_MAX);
-    XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_TMR0_CCU4_CC, 0);
-    XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_TMR1_CCU4_CC, 0);
-    XMC_CCU4_EnableShadowTransfer(DRV5053_TMR_CCU4, DRV5053_TMR0_CCU4_SLICE | DRV5053_TMR0_CCU4_SLICE_PRE);
-    XMC_CCU4_EnableShadowTransfer(DRV5053_TMR_CCU4, DRV5053_TMR1_CCU4_SLICE | DRV5053_TMR1_CCU4_SLICE_PRE);
+    XMC_CCU4_EnableClock(DRV5053_TMR_CCU4, DRV5053_TMR_CCU4_SLICE_NUM);
+    XMC_CCU4_SLICE_CompareInit(DRV5053_TMR_CCU4_CC, &timer_config);
+    XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_TMR_CCU4_CC, UINT16_MAX);
+    XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_TMR_CCU4_CC, 0);
+    XMC_CCU4_EnableShadowTransfer(DRV5053_TMR_CCU4, DRV5053_TMR_CCU4_SLICE | DRV5053_TMR_CCU4_SLICE_PRE);
 
-    XMC_CCU4_SLICE_EnableEvent(DRV5053_TMR0_CCU4_CC, XMC_CCU4_SLICE_IRQ_ID_PERIOD_MATCH);
-    XMC_CCU4_SLICE_EnableEvent(DRV5053_TMR1_CCU4_CC, XMC_CCU4_SLICE_IRQ_ID_PERIOD_MATCH);
-    XMC_CCU4_SLICE_SetInterruptNode(DRV5053_TMR0_CCU4_CC, XMC_CCU4_SLICE_IRQ_ID_PERIOD_MATCH, DRV5053_TMR0_SR_ID);
-    XMC_CCU4_SLICE_SetInterruptNode(DRV5053_TMR1_CCU4_CC, XMC_CCU4_SLICE_IRQ_ID_PERIOD_MATCH, DRV5053_TMR1_SR_ID);
-    NVIC_SetPriority(DRV5053_TMR0_IRQ, DRV5053_TMR_IRQ_PRIORITY);
-    NVIC_SetPriority(DRV5053_TMR1_IRQ, DRV5053_TMR_IRQ_PRIORITY);
-    NVIC_EnableIRQ(DRV5053_TMR0_IRQ);
-    NVIC_EnableIRQ(DRV5053_TMR1_IRQ);
+    XMC_CCU4_SLICE_EnableEvent(DRV5053_TMR_CCU4_CC, XMC_CCU4_SLICE_IRQ_ID_PERIOD_MATCH);
+    XMC_CCU4_SLICE_SetInterruptNode(DRV5053_TMR_CCU4_CC, XMC_CCU4_SLICE_IRQ_ID_PERIOD_MATCH, DRV5053_TMR_SR_ID);
+    NVIC_SetPriority(DRV5053_TMR_IRQ, DRV5053_TMR_IRQ_PRIORITY);
+    NVIC_EnableIRQ(DRV5053_TMR_IRQ);
 }
 
 void drv5053_init(void) {
@@ -359,21 +331,19 @@ void drv5053_init(void) {
 
 void drv5053_update_counter_config(void) {
 	// Note: A high threhold in uT is a low voltage
-	int32_t adc_low  = (-drv5053.counter_threshold_high + DRV5053_ZERO_OFFSET);
-	int32_t adc_high = (-drv5053.counter_threshold_low  + DRV5053_ZERO_OFFSET);
+	int32_t mv_low  = (-drv5053.counter_threshold_high*90/1000) + DRV5053_ZERO_OFFSET_MV;
+	int32_t mv_high = (-drv5053.counter_threshold_low*90/1000)  + DRV5053_ZERO_OFFSET_MV;
 
-	adc_low  = DRV5053_ZERO_OFFSET*2 - BETWEEN(0, adc_low,  DRV5053_ZERO_OFFSET*2);
-	adc_high = DRV5053_ZERO_OFFSET*2 - BETWEEN(0, adc_high, DRV5053_ZERO_OFFSET*2);
+	mv_low  = 3300 - BETWEEN(0, mv_low,  3300);
+	mv_high = 3300 - BETWEEN(0, mv_high, 3300);
 
-	XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_REF0_CCU4_CC, adc_low/10);
-	XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_REF1_CCU4_CC, adc_high/10);
+	XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_REF0_CCU4_CC, mv_low);
+	XMC_CCU4_SLICE_SetTimerCompareMatch(DRV5053_REF1_CCU4_CC, mv_high);
 	XMC_CCU4_EnableShadowTransfer(CCU40, DRV5053_REF0_CCU4_SLICE);
 	XMC_CCU4_EnableShadowTransfer(CCU40, DRV5053_REF1_CCU4_SLICE);
 
-    XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_TMR0_CCU4_CC, MAX(1, drv5053.counter_debounce/16));
-    XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_TMR1_CCU4_CC, MAX(1, drv5053.counter_debounce/16));
-    XMC_CCU4_EnableShadowTransfer(DRV5053_TMR_CCU4, DRV5053_TMR0_CCU4_SLICE | DRV5053_TMR0_CCU4_SLICE_PRE);
-    XMC_CCU4_EnableShadowTransfer(DRV5053_TMR_CCU4, DRV5053_TMR1_CCU4_SLICE | DRV5053_TMR1_CCU4_SLICE_PRE);
+    XMC_CCU4_SLICE_SetTimerPeriodMatch(DRV5053_TMR_CCU4_CC, MAX(1, drv5053.counter_debounce/16));
+    XMC_CCU4_EnableShadowTransfer(DRV5053_TMR_CCU4, DRV5053_TMR_CCU4_SLICE | DRV5053_TMR_CCU4_SLICE_PRE);
 }
 
 void drv5053_tick(void) {
@@ -395,7 +365,7 @@ void drv5053_tick(void) {
 //		uint32_t mv = voltage*3300/(4095*4);
 //		uint32_t ut = mv*1000/90;
 //		uint32_t ut = voltage*3300*1000/(4095*4*90);
-		int32_t ut = -(value*5500/2457 - DRV5053_ZERO_OFFSET);
+		int32_t ut = -(value*5500/2457 - DRV5053_ZERO_OFFSET_ADC);
 		drv5053.magnetic_flux_density = ut;
 	}
 }
@@ -405,5 +375,5 @@ int16_t drv5053_get_magnetic_flux_density(void) {
 }
 
 uint32_t drv5053_get_count(void) {
-	return drv5053_count0 + drv5053_count1;
+	return drv5053_count;
 }
