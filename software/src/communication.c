@@ -1,5 +1,5 @@
 /* hall-effect-v2-bricklet
- * Copyright (C) 2018 Olaf Lüke <olaf@tinkerforge.com>
+ * Copyright (C) 2019 Olaf Lüke <olaf@tinkerforge.com>
  *
  * communication.c: TFP protocol message handling
  *
@@ -24,17 +24,93 @@
 #include "bricklib2/utility/communication_callback.h"
 #include "bricklib2/protocols/tfp/tfp.h"
 
+#include "drv5053.h"
+
+#define CALLBACK_VALUE_TYPE CALLBACK_VALUE_TYPE_INT16
+#include "bricklib2/utility/callback_value.h"
+CallbackValue_int16_t callback_value_magnetic_flux_density;
+
+
 BootloaderHandleMessageResponse handle_message(const void *message, void *response) {
 	switch(tfp_get_fid_from_message(message)) {
-
+		case FID_GET_MAGNETIC_FLUX_DENSITY: return get_callback_value_int16_t(message, response, &callback_value_magnetic_flux_density);
+		case FID_SET_MAGNETIC_FLUX_DENSITY_CALLBACK_CONFIGURATION: return set_callback_value_callback_configuration_int16_t(message, &callback_value_magnetic_flux_density);
+		case FID_GET_MAGNETIC_FLUX_DENSITY_CALLBACK_CONFIGURATION: return get_callback_value_callback_configuration_int16_t(message, response, &callback_value_magnetic_flux_density);
+		case FID_GET_COUNTER: return get_counter(message, response);
+		case FID_SET_COUNTER_CONFIG: return set_counter_config(message);
+		case FID_GET_COUNTER_CONFIG: return get_counter_config(message, response);
+		case FID_SET_COUNTER_CALLBACK_CONFIGURATION: return set_counter_callback_configuration(message);
+		case FID_GET_COUNTER_CALLBACK_CONFIGURATION: return get_counter_callback_configuration(message, response);
 		default: return HANDLE_MESSAGE_RESPONSE_NOT_SUPPORTED;
 	}
 }
 
+BootloaderHandleMessageResponse get_counter(const GetCounter *data, GetCounter_Response *response) {
+	response->header.length = sizeof(GetCounter_Response);
+	response->count         = drv5053_get_count();
+
+	return HANDLE_MESSAGE_RESPONSE_NEW_MESSAGE;
+}
+
+BootloaderHandleMessageResponse set_counter_config(const SetCounterConfig *data) {
+	if(data->debounce > 1000000) {
+		return HANDLE_MESSAGE_RESPONSE_INVALID_PARAMETER;
+	}
+
+	drv5053.counter_threshold_high = data->high_threshold;
+	drv5053.counter_threshold_low  = data->low_threshold;
+	drv5053.counter_debounce       = data->debounce;
+	drv5053.counter_config_new     = true;
+
+	return HANDLE_MESSAGE_RESPONSE_EMPTY;
+}
+
+BootloaderHandleMessageResponse get_counter_config(const GetCounterConfig *data, GetCounterConfig_Response *response) {
+	response->header.length = sizeof(GetCounterConfig_Response);
+	response->high_threshold = drv5053.counter_threshold_high;
+	response->low_threshold  = drv5053.counter_threshold_low;
+	response->debounce       = drv5053.counter_debounce;
+
+	return HANDLE_MESSAGE_RESPONSE_NEW_MESSAGE;
+}
+
+BootloaderHandleMessageResponse set_counter_callback_configuration(const SetCounterCallbackConfiguration *data) {
+
+	return HANDLE_MESSAGE_RESPONSE_EMPTY;
+}
+
+BootloaderHandleMessageResponse get_counter_callback_configuration(const GetCounterCallbackConfiguration *data, GetCounterCallbackConfiguration_Response *response) {
+	response->header.length = sizeof(GetCounterCallbackConfiguration_Response);
+
+	return HANDLE_MESSAGE_RESPONSE_NEW_MESSAGE;
+}
 
 
+bool handle_magnetic_flux_density_callback(void) {
+	return handle_callback_value_callback_int16_t(&callback_value_magnetic_flux_density, FID_CALLBACK_MAGNETIC_FLUX_DENSITY);
+}
 
+bool handle_counter_callback(void) {
+	static bool is_buffered = false;
+	static Counter_Callback cb;
 
+	if(!is_buffered) {
+		tfp_make_default_header(&cb.header, bootloader_get_uid(), sizeof(Counter_Callback), FID_CALLBACK_COUNTER);
+		// TODO: Implement Counter callback handling
+
+		return false;
+	}
+
+	if(bootloader_spitfp_is_send_possible(&bootloader_status.st)) {
+		bootloader_spitfp_send_ack_and_message(&bootloader_status, (uint8_t*)&cb, sizeof(Counter_Callback));
+		is_buffered = false;
+		return true;
+	} else {
+		is_buffered = true;
+	}
+
+	return false;
+}
 
 
 void communication_tick(void) {
@@ -42,5 +118,7 @@ void communication_tick(void) {
 }
 
 void communication_init(void) {
+	callback_value_init_int16_t(&callback_value_magnetic_flux_density, drv5053_get_magnetic_flux_density);
+
 	communication_callback_init();
 }

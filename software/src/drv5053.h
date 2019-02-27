@@ -1,7 +1,7 @@
 /* hall-effect-v2-bricklet
  * Copyright (C) 2018 Olaf Lüke <olaf@tinkerforge.com>
  *
- * main.c: Initialization for Hall Effect Bricklet 2.0
+ * drv5053.h: Driver for DRV5053
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,27 +19,26 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <stdio.h>
+#ifndef DRV5053_H
+#define DRV5053_H
+
+#include <stdint.h>
 #include <stdbool.h>
 
-#include "configs/config.h"
+typedef struct {
+    int16_t magnetic_flux_density;
 
-#include "bricklib2/bootloader/bootloader.h"
-#include "bricklib2/hal/system_timer/system_timer.h"
-#include "bricklib2/logging/logging.h"
-#include "communication.h"
-#include "drv5053.h"
+    int16_t counter_threshold_high;
+    int16_t counter_threshold_low;
+    uint32_t counter_debounce;
+    bool counter_config_new;
+} DRV5053;
 
-int main(void) {
-	logging_init();
-	logd("Start Hall Effect Bricklet 2.0\n\r");
+extern DRV5053 drv5053;
 
-	communication_init();
-	drv5053_init();
+void drv5053_init(void);
+void drv5053_tick(void);
+int16_t drv5053_get_magnetic_flux_density(void);
+uint32_t drv5053_get_count(void);
 
-	while(true) {
-		bootloader_tick();
-		communication_tick();
-		drv5053_tick();
-	}
-}
+#endif

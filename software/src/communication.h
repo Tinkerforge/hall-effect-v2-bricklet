@@ -1,5 +1,5 @@
 /* hall-effect-v2-bricklet
- * Copyright (C) 2018 Olaf Lüke <olaf@tinkerforge.com>
+ * Copyright (C) 2019 Olaf Lüke <olaf@tinkerforge.com>
  *
  * communication.h: TFP protocol message handling
  *
@@ -34,6 +34,12 @@ void communication_tick(void);
 void communication_init(void);
 
 // Constants
+#define HALL_EFFECT_V2_THRESHOLD_OPTION_OFF 'x'
+#define HALL_EFFECT_V2_THRESHOLD_OPTION_OUTSIDE 'o'
+#define HALL_EFFECT_V2_THRESHOLD_OPTION_INSIDE 'i'
+#define HALL_EFFECT_V2_THRESHOLD_OPTION_SMALLER '<'
+#define HALL_EFFECT_V2_THRESHOLD_OPTION_GREATER '>'
+
 #define HALL_EFFECT_V2_BOOTLOADER_MODE_BOOTLOADER 0
 #define HALL_EFFECT_V2_BOOTLOADER_MODE_FIRMWARE 1
 #define HALL_EFFECT_V2_BOOTLOADER_MODE_BOOTLOADER_WAIT_FOR_REBOOT 2
@@ -53,19 +59,84 @@ void communication_init(void);
 #define HALL_EFFECT_V2_STATUS_LED_CONFIG_SHOW_STATUS 3
 
 // Function and callback IDs and structs
+#define FID_GET_MAGNETIC_FLUX_DENSITY 1
+#define FID_SET_MAGNETIC_FLUX_DENSITY_CALLBACK_CONFIGURATION 2
+#define FID_GET_MAGNETIC_FLUX_DENSITY_CALLBACK_CONFIGURATION 3
+#define FID_GET_COUNTER 5
+#define FID_SET_COUNTER_CONFIG 6
+#define FID_GET_COUNTER_CONFIG 7
+#define FID_SET_COUNTER_CALLBACK_CONFIGURATION 8
+#define FID_GET_COUNTER_CALLBACK_CONFIGURATION 9
 
+#define FID_CALLBACK_MAGNETIC_FLUX_DENSITY 4
+#define FID_CALLBACK_COUNTER 10
 
+typedef struct {
+	TFPMessageHeader header;
+	bool reset_counter;
+} __attribute__((__packed__)) GetCounter;
+
+typedef struct {
+	TFPMessageHeader header;
+	uint32_t count;
+} __attribute__((__packed__)) GetCounter_Response;
+
+typedef struct {
+	TFPMessageHeader header;
+	int16_t high_threshold;
+	int16_t low_threshold;
+	uint32_t debounce;
+} __attribute__((__packed__)) SetCounterConfig;
+
+typedef struct {
+	TFPMessageHeader header;
+} __attribute__((__packed__)) GetCounterConfig;
+
+typedef struct {
+	TFPMessageHeader header;
+	int16_t high_threshold;
+	int16_t low_threshold;
+	uint32_t debounce;
+} __attribute__((__packed__)) GetCounterConfig_Response;
+
+typedef struct {
+	TFPMessageHeader header;
+	uint32_t period;
+	bool value_has_to_change;
+} __attribute__((__packed__)) SetCounterCallbackConfiguration;
+
+typedef struct {
+	TFPMessageHeader header;
+} __attribute__((__packed__)) GetCounterCallbackConfiguration;
+
+typedef struct {
+	TFPMessageHeader header;
+	uint32_t period;
+	bool value_has_to_change;
+} __attribute__((__packed__)) GetCounterCallbackConfiguration_Response;
+
+typedef struct {
+	TFPMessageHeader header;
+	uint32_t count;
+} __attribute__((__packed__)) Counter_Callback;
 
 
 // Function prototypes
-
+BootloaderHandleMessageResponse get_counter(const GetCounter *data, GetCounter_Response *response);
+BootloaderHandleMessageResponse set_counter_config(const SetCounterConfig *data);
+BootloaderHandleMessageResponse get_counter_config(const GetCounterConfig *data, GetCounterConfig_Response *response);
+BootloaderHandleMessageResponse set_counter_callback_configuration(const SetCounterCallbackConfiguration *data);
+BootloaderHandleMessageResponse get_counter_callback_configuration(const GetCounterCallbackConfiguration *data, GetCounterCallbackConfiguration_Response *response);
 
 // Callbacks
-
+bool handle_magnetic_flux_density_callback(void);
+bool handle_counter_callback(void);
 
 #define COMMUNICATION_CALLBACK_TICK_WAIT_MS 1
-#define COMMUNICATION_CALLBACK_HANDLER_NUM 0
+#define COMMUNICATION_CALLBACK_HANDLER_NUM 2
 #define COMMUNICATION_CALLBACK_LIST_INIT \
+	handle_magnetic_flux_density_callback, \
+	handle_counter_callback, \
 
 
 #endif
