@@ -39,6 +39,6 @@ extern DRV5053 drv5053;
 void drv5053_init(void);
 void drv5053_tick(void);
 int16_t drv5053_get_magnetic_flux_density(void);
-uint32_t drv5053_get_count(void);
+uint32_t drv5053_get_count(bool reset);
 
 #endif

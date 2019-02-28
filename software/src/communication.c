@@ -47,7 +47,7 @@ BootloaderHandleMessageResponse handle_message(const void *message, void *respon
 
 BootloaderHandleMessageResponse get_counter(const GetCounter *data, GetCounter_Response *response) {
 	response->header.length = sizeof(GetCounter_Response);
-	response->count         = drv5053_get_count();
+	response->count         = drv5053_get_count(data->reset_counter);
 
 	return HANDLE_MESSAGE_RESPONSE_NEW_MESSAGE;
 }

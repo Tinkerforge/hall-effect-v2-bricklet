@@ -374,6 +374,14 @@ int16_t drv5053_get_magnetic_flux_density(void) {
 	return drv5053.magnetic_flux_density;
 }
 
-uint32_t drv5053_get_count(void) {
-	return drv5053_count;
+uint32_t drv5053_get_count(bool reset) {
+	if(!reset) {
+		return drv5053_count;
+	}
+
+	__disable_irq();
+	const uint32_t tmp = drv5053_count;
+	drv5053_count = 0;
+	__enable_irq();
+	return tmp;
 }
