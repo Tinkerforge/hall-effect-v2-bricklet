@@ -228,13 +228,13 @@ void drv5053_init_comperator(void) {
 		.input_b                    = XMC_ERU_ETL_INPUT_B0, // Event input selection for B(0-3)
 		.enable_output_trigger      = 1,
 		.status_flag_mode           = XMC_ERU_ETL_STATUS_FLAG_MODE_HWCTRL, // enable the status flag auto clear for opposite edge
-		.edge_detection             = XMC_ERU_ETL_EDGE_DETECTION_FALLING,  // Select the edge/s to convert as event
+		.edge_detection             = XMC_ERU_ETL_EDGE_DETECTION_RISING,  // Select the edge/s to convert as event
 		.output_trigger_channel     = XMC_ERU_ETL_OUTPUT_TRIGGER_CHANNEL0, // Select the source for event
 		.source                     = XMC_ERU_ETL_SOURCE_A
 	};
 
 	XMC_ERU_ETL_Init(XMC_ERU0, DRV5053_CMP0_ETL_CHANNEL, &eru_etl_config);
-	eru_etl_config.edge_detection = XMC_ERU_ETL_EDGE_DETECTION_RISING;
+	eru_etl_config.edge_detection = XMC_ERU_ETL_EDGE_DETECTION_FALLING;
 	XMC_ERU_ETL_Init(XMC_ERU0, DRV5053_CMP1_ETL_CHANNEL, &eru_etl_config);
 
 	XMC_ERU_OGU_SetServiceRequestMode(XMC_ERU0, DRV5053_CMP0_OGU_CHANNEL, XMC_ERU_OGU_SERVICE_REQUEST_ON_TRIGGER);
