@@ -323,8 +323,8 @@ void drv5053_init(void) {
 	drv5053_init_timer();
 	drv5053_init_adc();
 
-	drv5053.counter_threshold_high = 5000;   // 5mT
-	drv5053.counter_threshold_low  = -5000;  // -5mT
+	drv5053.counter_threshold_high = 2000;   // 2mT
+	drv5053.counter_threshold_low  = -2000;  // -2mT
 	drv5053.counter_debounce       = 100000; // 100ms
 	drv5053.counter_config_new     = true;
 }
