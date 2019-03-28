@@ -1,0 +1,43 @@
+Notebook[{
+ Cell[
+  BoxData[{
+   RowBox[{"Needs", "[", "\"\<NETLink`\>\"", "]"}],
+   RowBox[{"LoadNETAssembly", "[", RowBox[{"\"\<Tinkerforge\>\"", ",", RowBox[{RowBox[{"NotebookDirectory", "[", "]"}], "<>", "\"\<../../..\>\""}]}], "]"}]
+  }], "Input"
+ ],
+ Cell[
+  BoxData[{
+   RowBox[{"host", "=", "\"\<localhost\>\""}],
+   RowBox[{"port", "=", "4223"}],
+   RowBox[{"uid", "=", "\"\<XYZ\>\"", RowBox[{"(*", "Change XYZ to the UID of your Hall Effect Bricklet 2.0", "*)"}]}],
+   RowBox[{"
+"}],
+   RowBox[{"(*", "Create IPConnection and device object", "*)"}],
+   RowBox[{"ipcon", "=", RowBox[{"NETNew", "[", "\"\<Tinkerforge.IPConnection\>\"", "]"}]}],
+   RowBox[{"he", "=", RowBox[{"NETNew", "[", RowBox[{"\"\<Tinkerforge.BrickletHallEffectV2\>\"", ",", "uid", ",", "ipcon"}], "]"}]}],
+   RowBox[{"ipcon", "@", RowBox[{"Connect", "[", RowBox[{"host", ",", "port"}], "]"}]}],
+   RowBox[{"
+"}],
+   RowBox[{"(*", "Configure counter with \.b13000\.b5T threshold and 10ms debounce", "*)"}],
+   RowBox[{"he", "@", RowBox[{"SetCounterConfig", "[", RowBox[{"3000", ",", RowBox[{"-", "3000"}], ",", "10000"}], "]"}]}],
+   RowBox[{"
+"}],
+   RowBox[{"(*", "Callback function for counter callback", "*)"}],
+   RowBox[{RowBox[{"CounterCB", "[", RowBox[{"sender_", ",", "counter_"}], "]"}], ":=", "\[IndentingNewLine]", RowBox[{"Print", "[", RowBox[{"\"\<Counter: \>\"", "<>", RowBox[{"ToString", "[", "counter", "]"}]}], "]"}]}],
+   RowBox[{"AddEventHandler", "[", RowBox[{RowBox[{"he", "@", "CounterCallback"}], ",", "CounterCB"}], "]"}],
+   RowBox[{"
+"}],
+   RowBox[{"(*", "Set period for counter callback to 0.1s (100ms)", "*)"}],
+   RowBox[{"he", "@", RowBox[{"SetCounterCallbackConfiguration", "[", RowBox[{"100", ",", "True"}], "]"}]}],
+   RowBox[{"
+"}],
+   RowBox[{"Input", "[", "\"\<Click OK to exit\>\"", "]"}],
+   RowBox[{"
+"}],
+   RowBox[{"(*", "Clean up", "*)"}],
+   RowBox[{"ipcon", "@", RowBox[{"Disconnect", "[", "]"}]}],
+   RowBox[{"ReleaseNETObject", "[", "he", "]"}],
+   RowBox[{"ReleaseNETObject", "[", "ipcon", "]"}]
+  }], "Input"
+ ]
+}]
