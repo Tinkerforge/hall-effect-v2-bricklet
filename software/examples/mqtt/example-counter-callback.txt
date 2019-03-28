@@ -1,0 +1,12 @@
+# Change XYZ to the UID of your Hall Effect Bricklet 2.0
+
+setup:
+	# Configure counter with ±3000µT threshold and 10ms debounce
+	publish '{"high_threshold": 3000, "low_threshold": -3000, "debounce": 10000}' to tinkerforge/request/hall_effect_v2_bricklet/XYZ/set_counter_config 
+	
+	# Handle incoming counter callbacks
+	subscribe to tinkerforge/callback/hall_effect_v2_bricklet/XYZ/counter
+	publish '{"register": true}' to tinkerforge/register/hall_effect_v2_bricklet/XYZ/counter # Register counter callback
+	
+	# Set period for counter callback to 0.1s (100ms)
+	publish '{"period": 100, "value_has_to_change": true}' to tinkerforge/request/hall_effect_v2_bricklet/XYZ/set_counter_callback_configuration
