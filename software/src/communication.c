@@ -66,7 +66,7 @@ BootloaderHandleMessageResponse set_counter_config(const SetCounterConfig *data)
 }
 
 BootloaderHandleMessageResponse get_counter_config(const GetCounterConfig *data, GetCounterConfig_Response *response) {
-	response->header.length = sizeof(GetCounterConfig_Response);
+	response->header.length  = sizeof(GetCounterConfig_Response);
 	response->high_threshold = drv5053.counter_threshold_high;
 	response->low_threshold  = drv5053.counter_threshold_low;
 	response->debounce       = drv5053.counter_debounce;
@@ -75,12 +75,16 @@ BootloaderHandleMessageResponse get_counter_config(const GetCounterConfig *data,
 }
 
 BootloaderHandleMessageResponse set_counter_callback_configuration(const SetCounterCallbackConfiguration *data) {
+	drv5053.cb_period              = data->period;
+	drv5053.cb_value_has_to_change = data->value_has_to_change;
 
 	return HANDLE_MESSAGE_RESPONSE_EMPTY;
 }
 
 BootloaderHandleMessageResponse get_counter_callback_configuration(const GetCounterCallbackConfiguration *data, GetCounterCallbackConfiguration_Response *response) {
-	response->header.length = sizeof(GetCounterCallbackConfiguration_Response);
+	response->header.length       = sizeof(GetCounterCallbackConfiguration_Response);
+	response->period              = drv5053.cb_period;
+	response->value_has_to_change = drv5053.cb_value_has_to_change;
 
 	return HANDLE_MESSAGE_RESPONSE_NEW_MESSAGE;
 }
@@ -93,12 +97,23 @@ bool handle_magnetic_flux_density_callback(void) {
 bool handle_counter_callback(void) {
 	static bool is_buffered = false;
 	static Counter_Callback cb;
+	static uint32_t last_count = 0;
+	static uint32_t last_time = 0;
 
 	if(!is_buffered) {
-		tfp_make_default_header(&cb.header, bootloader_get_uid(), sizeof(Counter_Callback), FID_CALLBACK_COUNTER);
-		// TODO: Implement Counter callback handling
+		if(drv5053.cb_period == 0 || !system_timer_is_time_elapsed_ms(last_time, drv5053.cb_period)) {
+			return false;
+		}
 
-		return false;
+		uint32_t new_count = drv5053_get_count(false);
+		if(drv5053.cb_value_has_to_change && (last_count == new_count)) {
+			return false;
+		}
+
+		tfp_make_default_header(&cb.header, bootloader_get_uid(), sizeof(Counter_Callback), FID_CALLBACK_COUNTER);
+		cb.count   = new_count;
+		last_count = new_count;
+		last_time  = system_timer_get_ms();
 	}
 
 	if(bootloader_spitfp_is_send_possible(&bootloader_status.st)) {

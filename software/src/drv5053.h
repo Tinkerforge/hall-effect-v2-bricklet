@@ -32,6 +32,9 @@ typedef struct {
     int16_t counter_threshold_low;
     uint32_t counter_debounce;
     bool counter_config_new;
+
+    uint32_t cb_period;
+    uint32_t cb_value_has_to_change;
 } DRV5053;
 
 extern DRV5053 drv5053;
