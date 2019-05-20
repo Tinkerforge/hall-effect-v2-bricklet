@@ -8,7 +8,7 @@ class Example
 	private static string UID = "XYZ"; // Change XYZ to the UID of your Hall Effect Bricklet 2.0
 
 	// Callback function for counter callback
-	static void CounterCB(BrickletHallEffectV2 sender, int counter)
+	static void CounterCB(BrickletHallEffectV2 sender, long counter)
 	{
 		Console.WriteLine("Counter: " + counter);
 	}

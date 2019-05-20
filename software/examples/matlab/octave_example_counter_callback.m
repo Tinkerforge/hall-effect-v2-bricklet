@@ -26,5 +26,13 @@ end
 
 % Callback function for counter callback
 function cb_counter(e)
-    fprintf("Counter: %d\n", e.counter);
+    fprintf("Counter: %d\n", java2int(e.counter));
+end
+
+function int = java2int(value)
+    if compare_versions(version(), "3.8", "<=")
+        int = value.intValue();
+    else
+        int = value;
+    end
 end

@@ -12,7 +12,7 @@ type
     ipcon: TIPConnection;
     he: TBrickletHallEffectV2;
   public
-    procedure CounterCB(sender: TBrickletHallEffectV2; const counter: word);
+    procedure CounterCB(sender: TBrickletHallEffectV2; const counter: longword);
     procedure Execute;
   end;
 
@@ -25,7 +25,7 @@ var
   e: TExample;
 
 { Callback procedure for counter callback }
-procedure TExample.CounterCB(sender: TBrickletHallEffectV2; const counter: word);
+procedure TExample.CounterCB(sender: TBrickletHallEffectV2; const counter: longword);
 begin
   WriteLn(Format('Counter: %d', [counter]));
 end;

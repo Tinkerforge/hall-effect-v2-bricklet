@@ -22,7 +22,7 @@ public class ExampleCounterCallback {
 
 		// Add counter listener
 		he.addCounterListener(new BrickletHallEffectV2.CounterListener() {
-			public void counter(int counter) {
+			public void counter(long counter) {
 				System.out.println("Counter: " + counter);
 			}
 		});

@@ -7,7 +7,7 @@ Module ExampleCounterCallback
     Const UID As String = "XYZ" ' Change XYZ to the UID of your Hall Effect Bricklet 2.0
 
     ' Callback subroutine for counter callback
-    Sub CounterCB(ByVal sender As BrickletHallEffectV2, ByVal counter As Integer)
+    Sub CounterCB(ByVal sender As BrickletHallEffectV2, ByVal counter As Long)
         Console.WriteLine("Counter: " + counter.ToString())
     End Sub
 

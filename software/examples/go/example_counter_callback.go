@@ -21,7 +21,7 @@ func main() {
 	// Configure counter with ±3000µT threshold and 10ms debounce
 	he.SetCounterConfig(3000, -3000, 10000)
 
-	he.RegisterCounterCallback(func(counter uint16) {
+	he.RegisterCounterCallback(func(counter uint32) {
 		fmt.Printf("Counter: %d\n", counter)
 	})
 

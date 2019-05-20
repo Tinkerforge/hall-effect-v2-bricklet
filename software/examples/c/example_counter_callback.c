@@ -8,7 +8,7 @@
 #define UID "XYZ" // Change XYZ to the UID of your Hall Effect Bricklet 2.0
 
 // Callback function for counter callback
-void cb_counter(uint16_t counter, void *user_data) {
+void cb_counter(uint32_t counter, void *user_data) {
 	(void)user_data; // avoid unused parameter warning
 
 	printf("Counter: %u\n", counter);
