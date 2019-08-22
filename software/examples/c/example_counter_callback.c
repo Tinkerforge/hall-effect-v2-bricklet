@@ -36,7 +36,7 @@ int main(void) {
 	// Register counter callback to function cb_counter
 	hall_effect_v2_register_callback(&he,
 	                                 HALL_EFFECT_V2_CALLBACK_COUNTER,
-	                                 (void *)cb_counter,
+	                                 (void (*)(void))cb_counter,
 	                                 NULL);
 
 	// Set period for counter callback to 0.1s (100ms)
