@@ -19,5 +19,5 @@ if __name__ == "__main__":
     magnetic_flux_density = he.get_magnetic_flux_density()
     print("Magnetic Flux Density: " + str(magnetic_flux_density) + " µT")
 
-    raw_input("Press key to exit\n") # Use input() in Python 3
+    input("Press key to exit\n") # Use raw_input() in Python 2
     ipcon.disconnect()

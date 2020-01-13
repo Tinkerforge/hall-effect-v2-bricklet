@@ -28,5 +28,5 @@ if __name__ == "__main__":
     # Set period for counter callback to 0.1s (100ms)
     he.set_counter_callback_configuration(100, True)
 
-    raw_input("Press key to exit\n") # Use input() in Python 3
+    input("Press key to exit\n") # Use raw_input() in Python 2
     ipcon.disconnect()
