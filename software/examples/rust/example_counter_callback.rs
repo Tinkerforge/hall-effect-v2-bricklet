@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                                           // Don't use device before ipcon is connected.
 
     // Configure counter with ±3000µT threshold and 10ms debounce
-    he.set_counter_config(3000, -3000, 10000);
+    he.set_counter_config(3000, -3000, 10000).recv()?;
 
     let counter_receiver = he.get_counter_callback_receiver();
 
