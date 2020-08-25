@@ -1,5 +1,3 @@
-
-
 #include "bindings/hal_common.h"
 #include "bindings/bricklet_hall_effect_v2.h"
 
@@ -7,15 +5,12 @@
 
 void check(int rc, const char* msg);
 
-
-
 // Callback function for counter callback
 void counter_handler(TF_HallEffectV2 *device, uint32_t counter, void *user_data) {
 	(void)device; (void)user_data; // avoid unused parameter warning
 
 	tf_hal_printf("Counter: %u\n", counter);
 }
-
 
 TF_HallEffectV2 he;
 
