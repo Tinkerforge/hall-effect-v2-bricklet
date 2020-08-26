@@ -18,19 +18,17 @@ void example_setup(TF_HalContext *hal) {
 	// Create device object
 	check(tf_hall_effect_v2_create(&he, UID, hal), "create device object");
 
-
 	// Configure counter with ±3000µT threshold and 10ms debounce
 	check(tf_hall_effect_v2_set_counter_config(&he, 3000, -3000,
 	                                           10000), "call set_counter_config");
 
 	// Register counter callback to function counter_handler
 	tf_hall_effect_v2_register_counter_callback(&he,
-	                                           counter_handler,
-	                                           NULL);
+	                                            counter_handler,
+	                                            NULL);
 
 	// Set period for counter callback to 0.1s (100ms)
 	tf_hall_effect_v2_set_counter_callback_configuration(&he, 100, true);
-
 }
 
 void example_loop(TF_HalContext *hal) {
