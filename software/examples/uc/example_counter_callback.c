@@ -5,14 +5,18 @@
 
 void check(int rc, const char* msg);
 
+void example_setup(TF_HalContext *hal);
+void example_loop(TF_HalContext *hal);
+
+
 // Callback function for counter callback
-void counter_handler(TF_HallEffectV2 *device, uint32_t counter, void *user_data) {
+static void counter_handler(TF_HallEffectV2 *device, uint32_t counter, void *user_data) {
 	(void)device; (void)user_data; // avoid unused parameter warning
 
 	tf_hal_printf("Counter: %u\n", counter);
 }
 
-TF_HallEffectV2 he;
+static TF_HallEffectV2 he;
 
 void example_setup(TF_HalContext *hal) {
 	// Create device object
