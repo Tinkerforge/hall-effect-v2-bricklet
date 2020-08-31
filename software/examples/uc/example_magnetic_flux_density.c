@@ -20,7 +20,7 @@ void example_setup(TF_HalContext *hal) {
 	check(tf_hall_effect_v2_get_magnetic_flux_density(&he,
 	                                                  &magnetic_flux_density), "get Magnetic Flux Density");
 
-	tf_hal_printf("Magnetic Flux Density: %d µT\n", magnetic_flux_density);
+	tf_hal_printf("Magnetic Flux Density: %I16d µT\n", magnetic_flux_density);
 }
 
 void example_loop(TF_HalContext *hal) {

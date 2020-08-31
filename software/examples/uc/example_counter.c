@@ -20,7 +20,7 @@ void example_setup(TF_HalContext *hal) {
 	check(tf_hall_effect_v2_get_counter(&he, false,
 	                                    &count), "get count without counter reset");
 
-	tf_hal_printf("Count: %u\n", count);
+	tf_hal_printf("Count: %I32u\n", count);
 }
 
 void example_loop(TF_HalContext *hal) {
