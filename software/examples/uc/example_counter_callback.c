@@ -9,8 +9,8 @@
 
 void check(int rc, const char* msg);
 
-void example_setup(TF_HalContext *hal);
-void example_loop(TF_HalContext *hal);
+void example_setup(TF_HAL *hal);
+void example_loop(TF_HAL *hal);
 
 
 // Callback function for counter callback
@@ -22,7 +22,7 @@ static void counter_handler(TF_HallEffectV2 *device, uint32_t counter, void *use
 
 static TF_HallEffectV2 he;
 
-void example_setup(TF_HalContext *hal) {
+void example_setup(TF_HAL *hal) {
 	// Create device object
 	check(tf_hall_effect_v2_create(&he, UID, hal), "create device object");
 
@@ -39,7 +39,7 @@ void example_setup(TF_HalContext *hal) {
 	tf_hall_effect_v2_set_counter_callback_configuration(&he, 100, true);
 }
 
-void example_loop(TF_HalContext *hal) {
+void example_loop(TF_HAL *hal) {
 	// Poll for callbacks
 	tf_hal_callback_tick(hal, 0);
 }
