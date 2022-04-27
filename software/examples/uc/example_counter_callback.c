@@ -1,17 +1,13 @@
 // This example is not self-contained.
-// It requres usage of the example driver specific to your platform.
+// It requires usage of the example driver specific to your platform.
 // See the HAL documentation.
 
-#include "bindings/hal_common.h"
-#include "bindings/bricklet_hall_effect_v2.h"
+#include "src/bindings/hal_common.h"
+#include "src/bindings/bricklet_hall_effect_v2.h"
 
-#define UID "XYZ" // Change XYZ to the UID of your Hall Effect Bricklet 2.0
-
-void check(int rc, const char* msg);
-
+void check(int rc, const char *msg);
 void example_setup(TF_HAL *hal);
 void example_loop(TF_HAL *hal);
-
 
 // Callback function for counter callback
 static void counter_handler(TF_HallEffectV2 *device, uint32_t counter, void *user_data) {
@@ -24,7 +20,7 @@ static TF_HallEffectV2 he;
 
 void example_setup(TF_HAL *hal) {
 	// Create device object
-	check(tf_hall_effect_v2_create(&he, UID, hal), "create device object");
+	check(tf_hall_effect_v2_create(&he, NULL, hal), "create device object");
 
 	// Configure counter with ±3000µT threshold and 10ms debounce
 	check(tf_hall_effect_v2_set_counter_config(&he, 3000, -3000,
