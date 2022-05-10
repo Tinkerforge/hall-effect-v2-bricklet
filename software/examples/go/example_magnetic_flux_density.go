@@ -20,7 +20,7 @@ func main() {
 
 	// Get current Magnetic Flux Density.
 	magneticFluxDensity, _ := he.GetMagneticFluxDensity()
-	fmt.Printf("Magnetic Flux Density:  µT\n", magneticFluxDensity)
+	fmt.Printf("Magnetic Flux Density: %d µT\n", magneticFluxDensity)
 
 	fmt.Print("Press enter to exit.")
 	fmt.Scanln()
